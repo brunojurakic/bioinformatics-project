@@ -1,6 +1,6 @@
 // Author: Bruno Jurakic
 
-#include "sequence_filter.h"
+#include "include/sequence_filter.h"
 
 #include <iostream>
 
@@ -52,6 +52,7 @@ std::string TrimAdapters(const std::string& sequence,
   int prefix_len = prefix_adapter.size();
   int suffix_len = suffix_adapter.size();
 
+  // Read must be long enough to have both prefix and suffix.
   if ((int)sequence.size() < prefix_len + suffix_len) return "";
 
   // Check if prefix matches, must 2 or less mismatches.
@@ -74,6 +75,7 @@ std::vector<std::string> TrimAndExtractGenes(
   for (const auto& read : reads) {
     std::string gene =
         TrimAdapters(read.sequence, prefix_adapter, suffix_adapter);
+    // Only keep sequences that are exactly the expected gene length.
     if ((int)gene.size() == target_gene_length) {
       genes.push_back(gene);
     }

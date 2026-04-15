@@ -1,6 +1,6 @@
 // Author: Bruno Jurakic
 
-#include "fastq_parser.h"
+#include "include/fastq_parser.h"
 
 #include <fstream>
 #include <stdexcept>
@@ -14,6 +14,7 @@ std::vector<FastqRead> ParseFastq(const std::string& filepath) {
   std::vector<FastqRead> reads;
   std::string name, sequence, plus_line, quality;
 
+  // Each FASTQ record is 4 lines: @name, sequence, +, quality.
   while (std::getline(file, name)) {
     if (name.empty()) continue;
     if (!name.empty() && name.back() == '\r') name.pop_back();

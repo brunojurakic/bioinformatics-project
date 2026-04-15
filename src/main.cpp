@@ -3,8 +3,8 @@
 #include <iostream>
 #include <string>
 
-#include "fastq_parser.h"
-#include "sequence_filter.h"
+#include "include/fastq_parser.h"
+#include "include/sequence_filter.h"
 
 int main(int argc, char* argv[]) {
   if (argc < 2) {

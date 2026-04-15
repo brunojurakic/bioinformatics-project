@@ -1,6 +1,6 @@
 // Author: Bruno Jurakic
 
-#include "fasta_io.h"
+#include "include/fasta_io.h"
 
 #include <fstream>
 #include <stdexcept>
@@ -20,12 +20,14 @@ std::vector<FastaRecord> ReadFasta(const std::string& filepath) {
     if (line.empty()) continue;
 
     if (line[0] == '>') {
+      // Save previous record before starting new one.
       if (!current.name.empty()) {
         records.push_back(current);
       }
       current.name = line.substr(1);
       current.sequence.clear();
     } else {
+      // Add to current sequence.
       current.sequence += line;
     }
   }

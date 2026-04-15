@@ -13,7 +13,7 @@ add_executable(gene_variant_finder
 )
 
 add_custom_target(format
-    COMMAND clang-format -i ${CMAKE_SOURCE_DIR}/src/*.cpp ${CMAKE_SOURCE_DIR}/src/*.h
+    COMMAND clang-format -i ${CMAKE_SOURCE_DIR}/src/*.cpp ${CMAKE_SOURCE_DIR}/src/include/*.h
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     COMMENT "Formatting source files with clang-format"
 )
