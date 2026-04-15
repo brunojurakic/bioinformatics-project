@@ -1,6 +1,5 @@
 build/
-data/*.fastq
-data/*.fasta
+data/
 *.o
 *.d
 *.exe
