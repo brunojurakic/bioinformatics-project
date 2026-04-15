@@ -22,4 +22,16 @@ std::vector<FastqRead> FilterByLength(const std::vector<FastqRead>& reads,
 // Prints a summary of the length distribution to stdout.
 void PrintLengthStats(const std::map<int, int>& histogram);
 
+// Trims adapter sequences from a read, returning only the gene region.
+// Returns an empty string if the prefix adapter is not found.
+std::string TrimAdapters(const std::string& sequence,
+                         const std::string& prefix_adapter,
+                         const std::string& suffix_adapter);
+
+// Trims adapters from all reads and returns only the ones that produce
+// exactly target_gene_length bases after trimming.
+std::vector<std::string> TrimAndExtractGenes(
+    const std::vector<FastqRead>& reads, const std::string& prefix_adapter,
+    const std::string& suffix_adapter, int target_gene_length);
+
 #endif

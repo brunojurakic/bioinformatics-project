@@ -28,5 +28,13 @@ int main(int argc, char* argv[]) {
   auto filtered = FilterByLength(reads, mode_length, tolerance);
   std::cout << "Reads after filtering: " << filtered.size() << "\n";
 
+  const std::string prefix_adapter = "GATCCTCTCTCTGCAGCACATTTCCTG";
+  const std::string suffix_adapter = "CAGCGGCGAGGTGACGCGAA";
+  int gene_length = 249;
+
+  auto genes = TrimAndExtractGenes(filtered, prefix_adapter, suffix_adapter,
+                                   gene_length);
+  std::cout << "Sequences after trimming: " << genes.size() << "\n";
+
   return 0;
 }
