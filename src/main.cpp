@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 
+#include "include/distance.h"
 #include "include/fastq_parser.h"
 #include "include/sequence_filter.h"
 
@@ -17,10 +18,10 @@ int main(int argc, char* argv[]) {
   std::cout << "Loaded " << reads.size() << " reads from " << input_path
             << "\n\n";
 
-  auto histogram = ComputeLengthHistogram(reads);
-  PrintLengthStats(histogram);
+  auto length_histogram = ComputeLengthHistogram(reads);
+  PrintLengthStats(length_histogram);
 
-  int mode_length = FindMostCommonLength(histogram);
+  int mode_length = FindMostCommonLength(length_histogram);
   int tolerance = 5;
   std::cout << "\nFiltering to " << mode_length << " +/- " << tolerance
             << " bp\n";
@@ -35,6 +36,20 @@ int main(int argc, char* argv[]) {
   auto genes = TrimAndExtractGenes(filtered, prefix_adapter, suffix_adapter,
                                    gene_length);
   std::cout << "Sequences after trimming: " << genes.size() << "\n";
+
+  if (genes.empty()) {
+    std::cerr << "No valid gene sequences after filtering/trimming.\n";
+    return 1;
+  }
+
+  const std::string& reference = genes.front();
+  const auto distances = DistancesToReference(genes, reference);
+  const auto distance_histogram = BuildDistanceHistogram(distances);
+
+  std::cout << "Distance histogram vs first sequence (reference):\n";
+  for (const auto& [distance, count] : distance_histogram) {
+    std::cout << "d=" << distance << " -> " << count << '\n';
+  }
 
   return 0;
 }
