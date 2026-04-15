@@ -8,4 +8,5 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 add_executable(gene_variant_finder
     src/main.cpp
     src/fastq_parser.cpp
+    src/sequence_filter.cpp
 )
