@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 
+#include "include/clustering.h"
 #include "include/distance.h"
 #include "include/fastq_parser.h"
 #include "include/sequence_filter.h"
@@ -40,6 +41,16 @@ int main(int argc, char* argv[]) {
   if (genes.empty()) {
     std::cerr << "No valid gene sequences after filtering/trimming.\n";
     return 1;
+  }
+
+  constexpr int cluster_threshold = 15;
+  const auto clusters = GreedyCentroidClustering(genes, cluster_threshold);
+
+  std::cout << "Clusters (threshold " << cluster_threshold
+            << "): " << clusters.size() << "\n";
+  for (int i = 0; i < static_cast<int>(clusters.size()); ++i) {
+    std::cout << "cluster_" << i
+              << " size=" << clusters[i].member_indices.size() << '\n';
   }
 
   const std::string& reference = genes.front();

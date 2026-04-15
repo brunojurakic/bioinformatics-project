@@ -11,6 +11,7 @@ add_executable(gene_variant_finder
     src/sequence_filter.cpp
     src/fasta_io.cpp
     src/distance.cpp
+    src/clustering.cpp
 )
 
 add_custom_target(format
