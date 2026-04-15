@@ -2,6 +2,7 @@
 
 #include "include/sequence_filter.h"
 
+#include <algorithm>
 #include <iostream>
 
 std::map<int, int> ComputeLengthHistogram(const std::vector<FastqRead>& reads) {

@@ -10,6 +10,7 @@ add_executable(gene_variant_finder
     src/fastq_parser.cpp
     src/sequence_filter.cpp
     src/fasta_io.cpp
+    src/distance.cpp
 )
 
 add_custom_target(format
