@@ -14,7 +14,8 @@ std::map<int, int> ComputeLengthHistogram(const std::vector<FastqRead>& reads);
 // Returns the length that appears most frequently.
 int FindMostCommonLength(const std::map<int, int>& histogram);
 
-// Keeps only reads whose length is within [target - tolerance, target + tolerance].
+// Keeps only reads whose length is within [target - tolerance, target +
+// tolerance].
 std::vector<FastqRead> FilterByLength(const std::vector<FastqRead>& reads,
                                       int target_length, int tolerance);
 

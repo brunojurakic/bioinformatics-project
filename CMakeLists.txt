@@ -10,3 +10,9 @@ add_executable(gene_variant_finder
     src/fastq_parser.cpp
     src/sequence_filter.cpp
 )
+
+add_custom_target(format
+    COMMAND clang-format -i ${CMAKE_SOURCE_DIR}/src/*.cpp ${CMAKE_SOURCE_DIR}/src/*.h
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    COMMENT "Formatting source files with clang-format"
+)
