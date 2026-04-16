@@ -1,4 +1,4 @@
-// Author: Martin Šainčević
+// Author: Martin Saincevic
 
 #ifndef CLUSTERING_H
 #define CLUSTERING_H

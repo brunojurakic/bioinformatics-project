@@ -1,9 +1,30 @@
-// Author: Bruno Jurakic
+// Author: Bruno Jurakic, Martin Saincevic
 
 #include "include/config.h"
 
 #include <iostream>
+#include <stdexcept>
 #include <string>
+
+namespace {
+
+bool ParseNonNegativeInt(const char* value, const std::string& name,
+                         int& out_value) {
+  try {
+    out_value = std::stoi(value);
+  } catch (const std::exception&) {
+    std::cerr << "Invalid integer for " << name << ": " << value << "\n";
+    return false;
+  }
+
+  if (out_value < 0) {
+    std::cerr << name << " must be >= 0\n";
+    return false;
+  }
+  return true;
+}
+
+}  // namespace
 
 bool ParseArgs(int argc, char* argv[], Config& config) {
   for (int i = 1; i < argc; ++i) {
@@ -19,13 +40,25 @@ bool ParseArgs(int argc, char* argv[], Config& config) {
     } else if (arg == "--eval-output" && i + 1 < argc) {
       config.evaluation_output_path = argv[++i];
     } else if (arg == "--cluster-threshold" && i + 1 < argc) {
-      config.cluster_threshold = std::stoi(argv[++i]);
+      if (!ParseNonNegativeInt(argv[++i], "--cluster-threshold",
+                               config.cluster_threshold)) {
+        return false;
+      }
     } else if (arg == "--length-tolerance" && i + 1 < argc) {
-      config.length_tolerance = std::stoi(argv[++i]);
+      if (!ParseNonNegativeInt(argv[++i], "--length-tolerance",
+                               config.length_tolerance)) {
+        return false;
+      }
     } else if (arg == "--min-cluster-size" && i + 1 < argc) {
-      config.min_cluster_size = std::stoi(argv[++i]);
+      if (!ParseNonNegativeInt(argv[++i], "--min-cluster-size",
+                               config.min_cluster_size)) {
+        return false;
+      }
     } else if (arg == "--merge-threshold" && i + 1 < argc) {
-      config.merge_threshold = std::stoi(argv[++i]);
+      if (!ParseNonNegativeInt(argv[++i], "--merge-threshold",
+                               config.merge_threshold)) {
+        return false;
+      }
     } else if (arg == "--verbose") {
       config.verbose = true;
     } else if (arg == "--help" || arg == "-h") {
@@ -35,7 +68,24 @@ bool ParseArgs(int argc, char* argv[], Config& config) {
       return false;
     }
   }
-  return !config.input_path.empty() || !config.input_dir.empty();
+
+  if (!config.input_path.empty() && !config.input_dir.empty()) {
+    std::cerr << "Use either --input or --input-dir, not both.\n";
+    return false;
+  }
+  if (config.input_path.empty() && config.input_dir.empty()) {
+    std::cerr << "Missing required input: use --input or --input-dir.\n";
+    return false;
+  }
+  if (!config.evaluation_output_path.empty() && config.expected_path.empty()) {
+    std::cerr << "--eval-output requires --expected.\n";
+    return false;
+  }
+  if (config.min_cluster_size <= 0) {
+    std::cerr << "--min-cluster-size must be > 0\n";
+    return false;
+  }
+  return true;
 }
 
 void PrintUsage(const std::string& program_name) {
@@ -58,4 +108,9 @@ void PrintUsage(const std::string& program_name) {
          "samples (default: 3)\n"
       << "  --verbose                 Print detailed progress info\n"
       << "  --help                    Show this help message\n";
+  std::cerr << "\nRules:\n"
+            << "  Exactly one of --input or --input-dir must be provided.\n"
+            << "  --eval-output can be used only with --expected.\n"
+            << "  Threshold arguments must be non-negative; --min-cluster-size "
+               "must be > 0.\n";
 }

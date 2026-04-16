@@ -1,4 +1,4 @@
-// Author: Martin Šainčević
+// Author: Martin Saincevic
 
 #include "include/clustering.h"
 

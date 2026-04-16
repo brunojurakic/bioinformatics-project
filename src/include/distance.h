@@ -1,4 +1,4 @@
-// Author: Martin Šainčević
+// Author: Martin Saincevic
 
 #ifndef DISTANCE_H
 #define DISTANCE_H
