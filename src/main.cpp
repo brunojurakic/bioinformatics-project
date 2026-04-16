@@ -1,6 +1,7 @@
 // Author: Bruno Jurakic, Martin Saincevic
 
 #include <algorithm>
+#include <chrono>
 #include <iostream>
 #include <string>
 
@@ -75,8 +76,13 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
+  using Clock = std::chrono::high_resolution_clock;
+  auto pipeline_start = Clock::now();
+
   // Parse FASTQ file.
+  auto t0 = Clock::now();
   auto reads = ParseFastq(config.input_path);
+  auto t1 = Clock::now();
   std::cout << "Loaded " << reads.size() << " reads from " << config.input_path
             << "\n";
 
@@ -88,6 +94,7 @@ int main(int argc, char* argv[]) {
 
   int mode_length = FindMostCommonLength(histogram);
   auto filtered = FilterByLength(reads, mode_length, config.length_tolerance);
+  auto t2 = Clock::now();
   std::cout << "Filtered to " << filtered.size() << " reads (" << mode_length
             << " +/- " << config.length_tolerance << " bp)\n";
 
@@ -98,6 +105,7 @@ int main(int argc, char* argv[]) {
 
   auto genes = TrimAndExtractGenes(filtered, prefix_adapter, suffix_adapter,
                                    gene_length);
+  auto t3 = Clock::now();
   std::cout << "Trimmed to " << genes.size() << " gene sequences ("
             << gene_length << " bp)\n";
 
@@ -108,6 +116,7 @@ int main(int argc, char* argv[]) {
 
   // Cluster sequences.
   auto clusters = GreedyCentroidClustering(genes, config.cluster_threshold);
+  auto t4 = Clock::now();
 
   // Keep only the clusters with enough reads.
   std::vector<Cluster> significant;
@@ -128,6 +137,7 @@ int main(int argc, char* argv[]) {
 
   // Build consensus for each cluster.
   auto consensi = BuildClusterConsensi(genes, significant);
+  auto t5 = Clock::now();
 
   for (int i = 0; i < (int)consensi.size(); ++i) {
     std::cout << "  Allele " << (i + 1) << ": "
@@ -176,6 +186,19 @@ int main(int argc, char* argv[]) {
       }
     }
   }
+
+  // Print timing results.
+  auto pipeline_end = Clock::now();
+  auto ms = [](auto start, auto end) {
+    return std::chrono::duration<double, std::milli>(end - start).count();
+  };
+  std::cout << "\nTiming:\n";
+  std::cout << "  Parsing:    " << ms(t0, t1) << " ms\n";
+  std::cout << "  Filtering:  " << ms(t1, t2) << " ms\n";
+  std::cout << "  Trimming:   " << ms(t2, t3) << " ms\n";
+  std::cout << "  Clustering: " << ms(t3, t4) << " ms\n";
+  std::cout << "  Consensus:  " << ms(t4, t5) << " ms\n";
+  std::cout << "  Total:      " << ms(pipeline_start, pipeline_end) << " ms\n";
 
   return 0;
 }
