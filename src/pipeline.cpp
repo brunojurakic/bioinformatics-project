@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <chrono>
 #include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -148,6 +149,9 @@ int RunSingleSample(const Config& config) {
   // Compare with expected alleles if provided.
   if (!config.expected_path.empty()) {
     auto expected = ReadFasta(config.expected_path);
+    std::vector<std::string> eval_rows;
+    eval_rows.push_back("expected_name\tbest_allele\tdistance");
+
     std::cout << "\nEvaluation against " << expected.size()
               << " expected alleles:\n";
     for (const auto& exp : expected) {
@@ -164,9 +168,26 @@ int RunSingleSample(const Config& config) {
       if (best_allele >= 0) {
         std::cout << "  " << exp.name << " -> allele_" << best_allele
                   << " (distance=" << best_dist << ")\n";
+        eval_rows.push_back(exp.name + "\tallele_" +
+                            std::to_string(best_allele) + "\t" +
+                            std::to_string(best_dist));
       } else {
         std::cout << "  " << exp.name << " -> NO MATCH\n";
+        eval_rows.push_back(exp.name + "\tNO_MATCH\tNA");
       }
+    }
+
+    if (!config.evaluation_output_path.empty()) {
+      std::ofstream eval_file(config.evaluation_output_path);
+      if (!eval_file.is_open()) {
+        throw std::runtime_error("Cannot create file: " +
+                                 config.evaluation_output_path);
+      }
+      for (const auto& row : eval_rows) {
+        eval_file << row << "\n";
+      }
+      std::cout << "Evaluation report written to "
+                << config.evaluation_output_path << "\n";
     }
   }
 

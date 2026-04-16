@@ -16,6 +16,8 @@ bool ParseArgs(int argc, char* argv[], Config& config) {
       config.output_path = argv[++i];
     } else if (arg == "--expected" && i + 1 < argc) {
       config.expected_path = argv[++i];
+    } else if (arg == "--eval-output" && i + 1 < argc) {
+      config.evaluation_output_path = argv[++i];
     } else if (arg == "--cluster-threshold" && i + 1 < argc) {
       config.cluster_threshold = std::stoi(argv[++i]);
     } else if (arg == "--length-tolerance" && i + 1 < argc) {
@@ -46,6 +48,7 @@ void PrintUsage(const std::string& program_name) {
       << "  --output <file>           Output FASTA file with discovered "
          "alleles\n"
       << "  --expected <file>         Expected alleles FASTA for evaluation\n"
+      << "  --eval-output <file>      Output TSV file for evaluation results\n"
       << "  --cluster-threshold <n>   Max Hamming distance within cluster "
          "(default: 15)\n"
       << "  --length-tolerance <n>    Length filter tolerance in bp "

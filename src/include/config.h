@@ -11,6 +11,7 @@ struct Config {
   std::string input_dir;
   std::string output_path;
   std::string expected_path;
+  std::string evaluation_output_path;
   int cluster_threshold = 15;
   int length_tolerance = 5;
   int min_cluster_size = 3;
