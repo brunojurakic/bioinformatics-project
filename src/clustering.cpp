@@ -2,7 +2,9 @@
 
 #include "include/clustering.h"
 
+#include <array>
 #include <limits>
+#include <stdexcept>
 
 #include "include/distance.h"
 
@@ -42,4 +44,68 @@ std::vector<Cluster> GreedyCentroidClustering(
   }
 
   return clusters;
+}
+
+std::string BuildMajorityConsensus(const std::vector<std::string>& sequences,
+                                   const Cluster& cluster) {
+  // Empty cluster has no representative sequence.
+  if (cluster.member_indices.empty()) {
+    return "";
+  }
+
+  const int first_index = cluster.member_indices.front();
+  if (first_index < 0 || first_index >= static_cast<int>(sequences.size())) {
+    throw std::invalid_argument("Cluster member index is out of range.");
+  }
+
+  // Assume equal read length inside one cluster and validate as we iterate.
+  const size_t sequence_length = sequences[first_index].size();
+  std::string consensus(sequence_length, 'N');
+
+  for (size_t pos = 0; pos < sequence_length; ++pos) {
+    // Count bases at this position: A, C, G, T, other.
+    std::array<int, 5> counts = {0, 0, 0, 0, 0};
+
+    for (int member_index : cluster.member_indices) {
+      if (member_index < 0 ||
+          member_index >= static_cast<int>(sequences.size())) {
+        throw std::invalid_argument("Cluster member index is out of range.");
+      }
+      const std::string& seq = sequences[member_index];
+      if (seq.size() != sequence_length) {
+        throw std::invalid_argument(
+            "All sequences inside a cluster must have equal length.");
+      }
+
+      switch (seq[pos]) {
+        case 'A':
+          ++counts[0];
+          break;
+        case 'C':
+          ++counts[1];
+          break;
+        case 'G':
+          ++counts[2];
+          break;
+        case 'T':
+          ++counts[3];
+          break;
+        default:
+          ++counts[4];
+          break;
+      }
+    }
+
+    const char bases[5] = {'A', 'C', 'G', 'T', 'N'};
+    // Deterministic tie-break comes from fixed base order above.
+    int best_base = 0;
+    for (int i = 1; i < 5; ++i) {
+      if (counts[i] > counts[best_base]) {
+        best_base = i;
+      }
+    }
+    consensus[pos] = bases[best_base];
+  }
+
+  return consensus;
 }

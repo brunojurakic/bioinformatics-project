@@ -17,4 +17,9 @@ struct Cluster {
 std::vector<Cluster> GreedyCentroidClustering(
     const std::vector<std::string>& sequences, int max_distance);
 
+// Builds a consensus sequence for one cluster using majority vote per position.
+// Tie-break order is A, C, G, T, then N for ambiguous/other bases.
+std::string BuildMajorityConsensus(const std::vector<std::string>& sequences,
+                                   const Cluster& cluster);
+
 #endif
