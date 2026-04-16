@@ -1,5 +1,6 @@
 // Author: Bruno Jurakic
 
+#include <algorithm>
 #include <iostream>
 #include <string>
 
@@ -60,6 +61,23 @@ int main(int argc, char* argv[]) {
   std::cout << "Distance histogram vs first sequence (reference):\n";
   for (const auto& [distance, count] : distance_histogram) {
     std::cout << "d=" << distance << " -> " << count << '\n';
+  }
+
+  const auto consensi = BuildClusterConsensi(genes, clusters);
+  std::cout << "Consensus sequences per cluster: " << consensi.size() << "\n";
+  for (int i = 0; i < static_cast<int>(consensi.size()); ++i) {
+    std::cout << "cluster_" << i << " consensus_length=" << consensi[i].size()
+              << " members=" << clusters[i].member_indices.size() << '\n';
+
+    // Print a short prefix to keep logs readable for large samples.
+    constexpr int preview_len = 30;
+    if (!consensi[i].empty()) {
+      const int preview_end =
+          std::min(preview_len, static_cast<int>(consensi[i].size()));
+      std::cout << "  consensus_preview="
+                << consensi[i].substr(0, static_cast<size_t>(preview_end))
+                << "\n";
+    }
   }
 
   return 0;

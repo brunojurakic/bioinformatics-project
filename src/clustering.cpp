@@ -109,3 +109,17 @@ std::string BuildMajorityConsensus(const std::vector<std::string>& sequences,
 
   return consensus;
 }
+
+std::vector<std::string> BuildClusterConsensi(
+    const std::vector<std::string>& sequences,
+    const std::vector<Cluster>& clusters) {
+  std::vector<std::string> consensi;
+  consensi.reserve(clusters.size());
+
+  // Reuse the single-cluster primitive to keep consensus logic centralized.
+  for (const auto& cluster : clusters) {
+    consensi.push_back(BuildMajorityConsensus(sequences, cluster));
+  }
+
+  return consensi;
+}

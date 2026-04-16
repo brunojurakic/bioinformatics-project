@@ -22,4 +22,9 @@ std::vector<Cluster> GreedyCentroidClustering(
 std::string BuildMajorityConsensus(const std::vector<std::string>& sequences,
                                    const Cluster& cluster);
 
+// Builds one consensus sequence per cluster (same order as input clusters).
+std::vector<std::string> BuildClusterConsensi(
+    const std::vector<std::string>& sequences,
+    const std::vector<Cluster>& clusters);
+
 #endif
