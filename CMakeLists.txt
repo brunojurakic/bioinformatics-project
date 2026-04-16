@@ -15,6 +15,7 @@ add_executable(gene_variant_finder
     src/multi_sample.cpp
     src/config.cpp
     src/pipeline.cpp
+    src/minimap2_runner.cpp
 )
 
 add_custom_target(format

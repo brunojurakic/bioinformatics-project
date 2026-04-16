@@ -39,6 +39,12 @@ bool ParseArgs(int argc, char* argv[], Config& config) {
       config.expected_path = argv[++i];
     } else if (arg == "--eval-output" && i + 1 < argc) {
       config.evaluation_output_path = argv[++i];
+    } else if (arg == "--reference" && i + 1 < argc) {
+      config.reference_path = argv[++i];
+    } else if (arg == "--minimap2-path" && i + 1 < argc) {
+      config.minimap2_path = argv[++i];
+    } else if (arg == "--mapping-output" && i + 1 < argc) {
+      config.mapping_output_path = argv[++i];
     } else if (arg == "--cluster-threshold" && i + 1 < argc) {
       if (!ParseNonNegativeInt(argv[++i], "--cluster-threshold",
                                config.cluster_threshold)) {
@@ -57,6 +63,11 @@ bool ParseArgs(int argc, char* argv[], Config& config) {
     } else if (arg == "--merge-threshold" && i + 1 < argc) {
       if (!ParseNonNegativeInt(argv[++i], "--merge-threshold",
                                config.merge_threshold)) {
+        return false;
+      }
+    } else if (arg == "--minimap-min-mapq" && i + 1 < argc) {
+      if (!ParseNonNegativeInt(argv[++i], "--minimap-min-mapq",
+                               config.minimap_min_mapq)) {
         return false;
       }
     } else if (arg == "--verbose") {
@@ -81,6 +92,10 @@ bool ParseArgs(int argc, char* argv[], Config& config) {
     std::cerr << "--eval-output requires --expected.\n";
     return false;
   }
+  if (!config.mapping_output_path.empty() && config.reference_path.empty()) {
+    std::cerr << "--mapping-output requires --reference.\n";
+    return false;
+  }
   if (config.min_cluster_size <= 0) {
     std::cerr << "--min-cluster-size must be > 0\n";
     return false;
@@ -99,6 +114,11 @@ void PrintUsage(const std::string& program_name) {
          "alleles\n"
       << "  --expected <file>         Expected alleles FASTA for evaluation\n"
       << "  --eval-output <file>      Output TSV file for evaluation results\n"
+      << "  --reference <file>        Reference FASTA for minimap2 mapping\n"
+      << "  --minimap2-path <path>    Path to minimap2 binary (default: "
+         "minimap2)\n"
+      << "  --mapping-output <file>   Output TSV file with read counts per "
+         "reference\n"
       << "  --cluster-threshold <n>   Max Hamming distance within cluster "
          "(default: 15)\n"
       << "  --length-tolerance <n>    Length filter tolerance in bp "
@@ -106,11 +126,14 @@ void PrintUsage(const std::string& program_name) {
       << "  --min-cluster-size <n>    Minimum reads per cluster (default: 3)\n"
       << "  --merge-threshold <n>     Max distance to merge alleles across "
          "samples (default: 3)\n"
+      << "  --minimap-min-mapq <n>    Minimum MAPQ to keep a minimap2 hit "
+         "(default: 0)\n"
       << "  --verbose                 Print detailed progress info\n"
       << "  --help                    Show this help message\n";
   std::cerr << "\nRules:\n"
             << "  Exactly one of --input or --input-dir must be provided.\n"
             << "  --eval-output can be used only with --expected.\n"
+            << "  --mapping-output can be used only with --reference.\n"
             << "  Threshold arguments must be non-negative; --min-cluster-size "
                "must be > 0.\n";
 }

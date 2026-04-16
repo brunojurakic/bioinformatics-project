@@ -1,4 +1,4 @@
-// Author: Bruno Jurakic
+// Author: Bruno Jurakic, Martin Saincevic
 
 #include "include/pipeline.h"
 
@@ -14,6 +14,7 @@
 #include "include/distance.h"
 #include "include/fasta_io.h"
 #include "include/fastq_parser.h"
+#include "include/minimap2_runner.h"
 #include "include/sequence_filter.h"
 
 SampleResult ProcessSample(const std::string& input_path,
@@ -64,6 +65,28 @@ SampleResult ProcessSample(const std::string& input_path,
 int RunSingleSample(const Config& config) {
   using Clock = std::chrono::high_resolution_clock;
   auto pipeline_start = Clock::now();
+
+  // Optional minimap2-based read assignment against provided references.
+  if (!config.reference_path.empty()) {
+    auto mapping_counts =
+        RunMinimap2ReadCounts(config.minimap2_path, config.reference_path,
+                              config.input_path, config.minimap_min_mapq);
+
+    int total_mapped = 0;
+    std::cout << "Minimap2 mapping counts by reference:\n";
+    for (const auto& [reference_name, count] : mapping_counts) {
+      total_mapped += count;
+      std::cout << "  " << reference_name << ": " << count << "\n";
+    }
+    std::cout << "  Total mapped reads: " << total_mapped << "\n";
+
+    if (!config.mapping_output_path.empty()) {
+      WriteMappingCountsTsv(config.mapping_output_path, mapping_counts);
+      std::cout << "Mapping report written to " << config.mapping_output_path
+                << "\n";
+    }
+    std::cout << "\n";
+  }
 
   // Parse FASTQ file.
   auto t0 = Clock::now();
@@ -150,7 +173,8 @@ int RunSingleSample(const Config& config) {
   if (!config.expected_path.empty()) {
     auto expected = ReadFasta(config.expected_path);
     std::vector<std::string> eval_rows;
-    eval_rows.push_back("expected_name\tbest_allele\tdistance");
+    // Collect rows for optional evaluation report.
+    eval_rows.emplace_back("expected_name\tbest_allele\tdistance");
 
     std::cout << "\nEvaluation against " << expected.size()
               << " expected alleles:\n";
@@ -178,6 +202,7 @@ int RunSingleSample(const Config& config) {
     }
 
     if (!config.evaluation_output_path.empty()) {
+      // Write evaluation rows in TSV format.
       std::ofstream eval_file(config.evaluation_output_path);
       if (!eval_file.is_open()) {
         throw std::runtime_error("Cannot create file: " +
@@ -209,6 +234,11 @@ int RunSingleSample(const Config& config) {
 
 int RunMultiSample(const Config& config) {
   namespace fs = std::filesystem;
+
+  if (!config.reference_path.empty()) {
+    std::cerr << "Warning: minimap2 mapping is currently available only in "
+                 "--input mode; skipping in --input-dir mode.\n";
+  }
 
   // Collect all deer fastq files sorted by name.
   std::vector<std::string> fastq_files;
