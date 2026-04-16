@@ -12,6 +12,9 @@ add_executable(gene_variant_finder
     src/fasta_io.cpp
     src/distance.cpp
     src/clustering.cpp
+    src/multi_sample.cpp
+    src/config.cpp
+    src/pipeline.cpp
 )
 
 add_custom_target(format
