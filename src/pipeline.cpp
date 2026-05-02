@@ -14,6 +14,7 @@
 #include "include/distance.h"
 #include "include/fasta_io.h"
 #include "include/fastq_parser.h"
+#include "include/memory_usage.h"
 #include "include/minimap2_runner.h"
 #include "include/sequence_filter.h"
 
@@ -263,6 +264,8 @@ int RunSingleSample(const Config& config) {
   std::cout << "  Consensus:  " << ms(t4, t5) << " ms\n";
   std::cout << "  Total:      " << ms(pipeline_start, pipeline_end) << " ms\n";
 
+  std::cout << "\nPeak memory usage: " << GetPeakMemoryMB() << " MB\n";
+
   return 0;
 }
 
@@ -326,6 +329,8 @@ int RunMultiSample(const Config& config) {
     std::cout << "\nAll unique alleles written to " << config.output_path
               << "\n";
   }
+
+  std::cout << "\nPeak memory usage: " << GetPeakMemoryMB() << " MB\n";
 
   return 0;
 }
