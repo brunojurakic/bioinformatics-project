@@ -15,6 +15,7 @@ struct Config {
   std::string reference_path;
   std::string minimap2_path = "minimap2";
   std::string mapping_output_path;
+  std::string cluster_assignments_path;
   int cluster_threshold = 15;
   int length_tolerance = 5;
   int min_cluster_size = 3;

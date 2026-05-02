@@ -34,4 +34,16 @@ std::vector<std::string> TrimAndExtractGenes(
     const std::vector<FastqRead>& reads, const std::string& prefix_adapter,
     const std::string& suffix_adapter, int target_gene_length);
 
+// A trimmed gene sequence with the name of its original FASTQ read.
+struct NamedGene {
+  std::string read_name;
+  std::string sequence;
+};
+
+// Trims adapters and keeps the original read name alongside each sequence.
+// Only includes reads that produce exactly target_gene_length bases.
+std::vector<NamedGene> TrimAndExtractNamedGenes(
+    const std::vector<FastqRead>& reads, const std::string& prefix_adapter,
+    const std::string& suffix_adapter, int target_gene_length);
+
 #endif

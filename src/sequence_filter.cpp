@@ -84,6 +84,22 @@ std::vector<std::string> TrimAndExtractGenes(
   return genes;
 }
 
+// Trims adapters and returns read_name, gene_sequence for reads that
+// have the expected gene length after trimming.
+std::vector<NamedGene> TrimAndExtractNamedGenes(
+    const std::vector<FastqRead>& reads, const std::string& prefix_adapter,
+    const std::string& suffix_adapter, int target_gene_length) {
+  std::vector<NamedGene> named_genes;
+  for (const auto& read : reads) {
+    std::string gene =
+        TrimAdapters(read.sequence, prefix_adapter, suffix_adapter);
+    if ((int)gene.size() == target_gene_length) {
+      named_genes.push_back({read.name, gene});
+    }
+  }
+  return named_genes;
+}
+
 void PrintLengthStats(const std::map<int, int>& histogram) {
   int total = 0;
   for (const auto& [length, count] : histogram) {

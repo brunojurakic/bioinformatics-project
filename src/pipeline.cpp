@@ -112,8 +112,13 @@ int RunSingleSample(const Config& config) {
   const std::string suffix_adapter = "CAGCGGCGAGGTGACGCGAA";
   int gene_length = 249;
 
-  auto genes = TrimAndExtractGenes(filtered, prefix_adapter, suffix_adapter,
-                                   gene_length);
+  auto named_genes = TrimAndExtractNamedGenes(filtered, prefix_adapter,
+                                              suffix_adapter, gene_length);
+
+  // Extract the gene sequences for clustering.
+  std::vector<std::string> genes;
+  genes.reserve(named_genes.size());
+  for (const auto& ng : named_genes) genes.push_back(ng.sequence);
   auto t3 = Clock::now();
   std::cout << "Trimmed to " << genes.size() << " gene sequences ("
             << gene_length << " bp)\n";
@@ -153,6 +158,35 @@ int RunSingleSample(const Config& config) {
     if (config.verbose) {
       std::cout << "    " << consensi[i] << "\n";
     }
+  }
+
+  // Write cluster assignments for each read.
+  if (!config.cluster_assignments_path.empty()) {
+    std::ofstream assignments_file(config.cluster_assignments_path);
+    if (!assignments_file.is_open()) {
+      throw std::runtime_error("Cannot create file: " +
+                               config.cluster_assignments_path);
+    }
+    assignments_file << "read_name\tcluster_id\n";
+
+    // Mark each read by which significant cluster it belongs to.
+    std::vector<int> read_to_cluster(named_genes.size(), -1);
+    for (int i = 0; i < (int)significant.size(); ++i) {
+      for (int idx : significant[i].member_indices) {
+        read_to_cluster[idx] = i + 1;
+      }
+    }
+
+    for (int i = 0; i < (int)named_genes.size(); ++i) {
+      if (read_to_cluster[i] >= 0) {
+        assignments_file << named_genes[i].read_name << "\tallele_"
+                         << read_to_cluster[i] << "\n";
+      } else {
+        assignments_file << named_genes[i].read_name << "\tnoise\n";
+      }
+    }
+    std::cout << "Cluster assignments written to "
+              << config.cluster_assignments_path << "\n";
   }
 
   // Write output FASTA.

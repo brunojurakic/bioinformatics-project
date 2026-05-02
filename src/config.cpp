@@ -45,6 +45,8 @@ bool ParseArgs(int argc, char* argv[], Config& config) {
       config.minimap2_path = argv[++i];
     } else if (arg == "--mapping-output" && i + 1 < argc) {
       config.mapping_output_path = argv[++i];
+    } else if (arg == "--cluster-assignments" && i + 1 < argc) {
+      config.cluster_assignments_path = argv[++i];
     } else if (arg == "--cluster-threshold" && i + 1 < argc) {
       if (!ParseNonNegativeInt(argv[++i], "--cluster-threshold",
                                config.cluster_threshold)) {
@@ -119,6 +121,8 @@ void PrintUsage(const std::string& program_name) {
          "minimap2)\n"
       << "  --mapping-output <file>   Output TSV file with read counts per "
          "reference\n"
+      << "  --cluster-assignments <file>  Output TSV with read_name -> "
+         "cluster_id mapping\n"
       << "  --cluster-threshold <n>   Max Hamming distance within cluster "
          "(default: 15)\n"
       << "  --length-tolerance <n>    Length filter tolerance in bp "
