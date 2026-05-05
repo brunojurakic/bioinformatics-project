@@ -19,6 +19,17 @@ add_executable(gene_variant_finder
     src/memory_usage.cpp
 )
 
+add_executable(test_runner
+    tests/test_main.cpp
+    src/distance.cpp
+    src/clustering.cpp
+    src/sequence_filter.cpp
+)
+target_include_directories(test_runner PRIVATE ${CMAKE_SOURCE_DIR}/src)
+
+enable_testing()
+add_test(NAME unit_tests COMMAND test_runner)
+
 add_custom_target(format
     COMMAND clang-format -i ${CMAKE_SOURCE_DIR}/src/*.cpp ${CMAKE_SOURCE_DIR}/src/include/*.h
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
