@@ -41,6 +41,36 @@ The repository includes a small demo dataset under `data/example/`:
 - `J30_example.fastq` (50 reads)
 - `expected.fasta` (first expected allele from J29/J30)
 
+## Demo script
+
+Run a full build + demo on the bundled example data:
+
+```zsh
+./scripts/demo.sh
+```
+
+Outputs are written to `data/example/out/`.
+
+## Unit tests
+
+Build and run the unit tests:
+
+```zsh
+cmake -S . -B build
+cmake --build build
+./build/test_runner
+```
+
+## Benchmark script
+
+Run a simple threshold benchmark on the example dataset:
+
+```zsh
+./scripts/benchmark.sh
+```
+
+The TSV report is written to `data/example/bench/benchmark.tsv`.
+
 ## Run examples
 
 ### 1) Single-sample allele discovery
@@ -83,3 +113,4 @@ The repository includes a small demo dataset under `data/example/`:
 - Minimap2 mapping is currently enabled in `--input` mode.
 - In `--input-dir` mode, clustering and cross-sample allele merge are used.
 - See `scripts/run_all_samples.sh` for a batch run helper.
+
