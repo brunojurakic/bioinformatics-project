@@ -33,6 +33,14 @@ cmake ..
 make
 ```
 
+## Example data
+
+The repository includes a small demo dataset under `data/example/`:
+
+- `J29_example.fastq` (50 reads)
+- `J30_example.fastq` (50 reads)
+- `expected.fasta` (first expected allele from J29/J30)
+
 ## Run examples
 
 ### 1) Single-sample allele discovery
@@ -75,4 +83,3 @@ make
 - Minimap2 mapping is currently enabled in `--input` mode.
 - In `--input-dir` mode, clustering and cross-sample allele merge are used.
 - See `scripts/run_all_samples.sh` for a batch run helper.
-

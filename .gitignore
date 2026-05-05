@@ -1,5 +1,7 @@
 build/
-data/
+data/*
+!data/example/
+!data/example/**
 *.o
 *.d
 *.exe
